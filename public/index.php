@@ -22,8 +22,15 @@ require_once $root . '/app/Controllers/RequestController.php';
 require_once $root . '/app/Controllers/AdminController.php';
 
 $config = require $configFile;
+$GLOBALS['app_config'] = $config;
 $db = new App\Core\Database($config['db']);
 $auth = new App\Core\Auth($db);
+
+$settingsRows = $db->query('SELECT setting_key, setting_value FROM settings');
+$_SESSION['settings'] = [];
+foreach ($settingsRows as $row) {
+    $_SESSION['settings'][$row['setting_key']] = $row['setting_value'];
+}
 
 $route = $_GET['r'] ?? 'home';
 $method = $_SERVER['REQUEST_METHOD'];
@@ -38,51 +45,45 @@ switch ($route) {
     case 'home':
         $home->index();
         break;
-
     case 'login':
         $method === 'POST' ? $authController->loginSubmit() : $authController->loginForm();
         break;
-
     case 'register':
         $method === 'POST' ? $authController->registerSubmit() : $authController->registerForm();
         break;
-
     case 'logout':
         $authController->logout();
         break;
-
     case 'dashboard':
         $dashboard->index();
         break;
-
     case 'requests.create':
         $method === 'POST' ? $requestController->store() : $requestController->create();
         break;
-
-    case 'requests.index':
-        $requestController->index();
-        break;
-
     case 'requests.show':
         $requestController->show((int) ($_GET['id'] ?? 0));
         break;
-
     case 'requests.update_status':
         $requestController->updateStatus((int) ($_GET['id'] ?? 0));
         break;
-
+    case 'requests.update_price':
+        $requestController->updatePrice((int) ($_GET['id'] ?? 0));
+        break;
+    case 'messages.send':
+        $requestController->sendMessage((int) ($_GET['id'] ?? 0));
+        break;
     case 'admin.users':
         $admin->users();
         break;
-
     case 'admin.users.create':
         $method === 'POST' ? $admin->storeUser() : $admin->createUser();
         break;
-
     case 'admin.assign':
         $admin->assignRequest((int) ($_GET['id'] ?? 0));
         break;
-
+    case 'admin.settings':
+        $method === 'POST' ? $admin->updateSettings() : $admin->settings();
+        break;
     default:
         http_response_code(404);
         echo 'الصفحة غير موجودة';
