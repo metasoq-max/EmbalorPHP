@@ -1,0 +1,26 @@
+RewriteEngine On
+
+# Static assets and uploads from /web
+RewriteRule ^assets/(.*)$ web/assets/$1 [L]
+RewriteRule ^uploads/(.*)$ web/uploads/$1 [L]
+
+# Pretty routes
+RewriteRule ^$ web/index.php?r=home [QSA,L]
+RewriteRule ^login$ web/index.php?r=login [QSA,L]
+RewriteRule ^register$ web/index.php?r=register [QSA,L]
+RewriteRule ^logout$ web/index.php?r=logout [QSA,L]
+RewriteRule ^dashboard$ web/index.php?r=dashboard [QSA,L]
+RewriteRule ^requests/create$ web/index.php?r=requests.create [QSA,L]
+RewriteRule ^requests/([0-9]+)$ web/index.php?r=requests.show&id=$1 [QSA,L]
+RewriteRule ^admin/users$ web/index.php?r=admin.users [QSA,L]
+RewriteRule ^admin/users/create$ web/index.php?r=admin.users.create [QSA,L]
+RewriteRule ^admin/settings$ web/index.php?r=admin.settings [QSA,L]
+RewriteRule ^notifications/latest$ web/index.php?r=notifications.latest [QSA,L]
+
+# Fallback files/folders
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Final fallback
+RewriteRule ^(.*)$ web/index.php [QSA,L]
